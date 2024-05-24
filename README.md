@@ -5,6 +5,7 @@ CREATE DATABASE Weather;
 use Weather;
 
 -- Create Locations Table
+
 CREATE TABLE Locations (
     location_id INT PRIMARY KEY,
     location_name VARCHAR(255),
@@ -12,7 +13,8 @@ CREATE TABLE Locations (
     longitude DECIMAL(10, 6)
 );
 
--- Insert data into Locations Table
+-- Insert data into the Locations Table
+
 INSERT INTO Locations (location_id, location_name, latitude, longitude) VALUES
 (1, 'New York', 40.7128, -74.0060),
 (2, 'Los Angeles', 34.0522, -118.2437),
@@ -61,6 +63,7 @@ INSERT INTO Locations (location_id, location_name, latitude, longitude) VALUES
 (45, 'Phoenix', 33.4484, -112.0740);
 
 -- Create Weather Data Table
+
 CREATE TABLE Weather_Data (
     data_id INT PRIMARY KEY,
     location_id INT,
