@@ -76,7 +76,8 @@ CREATE TABLE Weather_Data (
     FOREIGN KEY (location_id) REFERENCES Locations(location_id)
 );
 
--- Insert data into Weather Data Table
+-- Insert data into the Weather Data Table
+
 INSERT INTO Weather_Data (data_id, location_id, timestamp, temperature, humidity, precipitation, wind_speed, weather_condition) VALUES
 (1, 1, '2024-02-29 12:00:00', 10.5, 70, 0.0, 3.2, 'Cloudy'),
 (2, 2, '2024-02-29 12:00:00', 20.3, 65, 0.0, 2.8, 'Sunny'),
@@ -110,102 +111,121 @@ INSERT INTO Weather_Data (data_id, location_id, timestamp, temperature, humidity
 (30, 30, '2024-02-29 12:00:00', 14.0, 83, 0.3, 2.5, 'Rainy');
 
 -- 1. List all locations stored in the Locations table.
+
 SELECT location_name FROM Locations;
 
--- 2. Retrieve the temperature and humidity for a specific location at a particular timestamp.
+-- 2. Retrieve the temperature and humidity for a specific location at a particular timestamp.<br>
 SELECT temperature, humidity
 FROM Weather_Data
 WHERE location_id = 25
 AND timestamp = '2024-02-29 12:00:00';
 
 -- 3. Display the total count of weather data entries for each location.
+
 SELECT location_id, COUNT(*) AS entry_count
 FROM Weather_Data
 GROUP BY location_id;
 
 -- 4. Find the average temperature for all locations.
+
 SELECT AVG(temperature) AS avg_temperature
 FROM Weather_Data;
 
 -- 5. List all locations with their respective latitude and longitude.
+
 SELECT location_name, latitude, longitude
 FROM Locations;
 
 -- 6. Calculate the highest recorded temperature for each location.
+
 SELECT location_id, MAX(temperature) AS max_temperature
 FROM Weather_Data
 GROUP BY location_id;
 
 -- 7. Display the weather conditions for a specific location and timestamp.
+
 SELECT weather_condition
 FROM Weather_Data
 WHERE location_id = <location_id>
 AND timestamp = '<timestamp>';
 
 -- 8. Find the locations with the lowest humidity levels.
+
 SELECT location_id, MIN(humidity) AS min_humidity
 FROM Weather_Data
 GROUP BY location_id;
 
 -- 9. List the timestamps for which weather data is available.
+
 SELECT DISTINCT timestamp
 FROM Weather_Data;
 
 -- 10. Identify locations with temperatures above 25 degrees Celsius.
+
 SELECT location_id
 FROM Weather_Data
 WHERE temperature > 25;
 
 -- 11. Rank locations based on the highest wind speed recorded.
+
 SELECT location_id, wind_speed,
 RANK() OVER (ORDER BY wind_speed DESC) AS wind_speed_rank
 FROM Weather_Data;
 
 -- 12. Determine the average humidity for each month across all locations.
+
 SELECT EXTRACT(MONTH FROM timestamp) AS month, AVG(humidity) AS avg_humidity
 FROM Weather_Data
 GROUP BY EXTRACT(MONTH FROM timestamp);
 
 -- 13. List locations with precipitation greater than 5mm.
+
 SELECT location_id
 FROM Weather_Data
 WHERE precipitation > 5;
 
 -- 14. Find the timestamp with the highest recorded temperature across all locations.
+
 SELECT timestamp
 FROM Weather_Data
 WHERE temperature = (SELECT MAX(temperature) FROM Weather_Data);
 
 -- 15. Calculate the total precipitation for each location in the last 7 days.
+
 SELECT location_id, SUM(precipitation) AS total_precipitation
 FROM Weather_Data
 WHERE timestamp >= CURRENT_DATE - INTERVAL '7 days'
 GROUP BY location_id;
 
 -- OR Solution for MYSQL
+
 SELECT location_id, SUM(precipitation) AS total_precipitation
 FROM Weather_Data
 WHERE timestamp >= CURRENT_DATE - INTERVAL 7 DAY
 GROUP BY location_id;
 
 -- 16. Identify locations where the temperature is higher than the average temperature across all locations.
+
 SELECT location_id
 FROM Weather_Data
 WHERE temperature > (SELECT AVG(temperature) FROM Weather_Data);
 
 -- 17. Display the top 5 locations with the highest humidity levels.
+
 SELECT location_id, humidity
 FROM Weather_Data
 ORDER BY humidity DESC
 LIMIT 5;
 
 -- 18. Rank locations based on the number of weather data entries.
+
 SELECT location_id, COUNT(*) AS entry_count,
 RANK() OVER (ORDER BY COUNT(*) DESC) AS entry_rank
 FROM Weather_Data
 GROUP BY location_id;
 
 -- 19. Find the locations with the most frequent occurrences of rainy weather conditions.
+
 SELECT location_id
 FROM Weather_Data
 WHERE weather_condition = 'Rainy'
@@ -214,16 +234,19 @@ ORDER BY COUNT(*) DESC
 LIMIT 1;
 
 -- 20. List all locations and their respective weather conditions at the latest timestamp.
+
 SELECT location_id, weather_condition
 FROM Weather_Data
 WHERE timestamp = (SELECT MAX(timestamp) FROM Weather_Data);
 
 -- 21. Calculate the difference between the maximum and minimum temperatures for each location.
+
 SELECT location_id, MAX(temperature) - MIN(temperature) AS temperature_difference
 FROM Weather_Data
 GROUP BY location_id;
 
 -- 22. Identify locations where the temperature has been steadily increasing over the past week.
+
 WITH TempDiff AS (
   SELECT location_id, temperature,
   LAG(temperature) OVER (PARTITION BY location_id ORDER BY timestamp) AS prev_temp
@@ -234,6 +257,7 @@ FROM TempDiff
 WHERE temperature > prev_temp;
 
 -- 23. Display the weather conditions for the most recent entry of each location.
+
 WITH LatestEntry AS (
   SELECT location_id, weather_condition,
   ROW_NUMBER() OVER (PARTITION BY location_id ORDER BY timestamp DESC) AS rn
@@ -244,6 +268,7 @@ FROM LatestEntry
 WHERE rn = 1;
 
 -- 24. Determine the month with the highest average temperature across all locations.
+
 SELECT EXTRACT(MONTH FROM timestamp) AS month, AVG(temperature) AS avg_temperature
 FROM Weather_Data
 GROUP BY EXTRACT(MONTH FROM timestamp)
@@ -251,6 +276,7 @@ ORDER BY AVG(temperature) DESC
 LIMIT 1;
 
 -- 25. Rank locations based on the total precipitation they received in the last month.
+
 SELECT location_id, SUM(precipitation) AS total_precipitation,
 RANK() OVER (ORDER BY SUM(precipitation) DESC) AS precipitation_rank
 FROM Weather_Data
@@ -258,16 +284,19 @@ WHERE timestamp >= CURRENT_DATE - INTERVAL '1 month'
 GROUP BY location_id;
 
 -- 26. Find locations where the wind speed is higher than the average wind speed.
+
 SELECT location_id, wind_speed
 FROM Weather_Data
 WHERE wind_speed > (SELECT AVG(wind_speed) FROM Weather_Data);
 
 -- 27. Calculate the moving average of temperature for each location over the last 7 days.
+
 SELECT location_id, timestamp, temperature,
 AVG(temperature) OVER (PARTITION BY location_id ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS moving_avg_temperature
 FROM Weather_Data;
 
 -- 28. Identify locations that experienced a temperature drop of more than 5 degrees Celsius within an hour.
+
 WITH TempWithPrev AS (
     SELECT location_id, timestamp, temperature,
            LAG(temperature) OVER (PARTITION BY location_id ORDER BY timestamp) AS prev_temp
@@ -281,6 +310,7 @@ WHERE ABS(temperature - prev_temp) > 5;
 
 
 -- 29. Display the top 3 locations with the highest average temperature in the last month.
+
 SELECT location_id, AVG(temperature) AS avg_temperature
 FROM Weather_Data
 WHERE timestamp >= CURRENT_DATE - INTERVAL '1 month'
@@ -298,6 +328,7 @@ ORDER BY avg_temperature DESC
 LIMIT 3;
 
 -- 30. Find the location with the maximum temperature variation within a day.
+
 SELECT location_id, MAX(temperature) - MIN(temperature) AS temp_variation
 FROM Weather_Data
 GROUP BY location_id
@@ -312,6 +343,7 @@ JOIN Locations l ON w.location_id = l.location_id
 WHERE w.timestamp = (SELECT MAX(timestamp) FROM Weather_Data WHERE location_id = w.location_id);
 
 -- 32. Calculate Trends and Patterns in Weather Data Over Time:
+
 SELECT DATE_FORMAT(timestamp, '%Y-%m-%d %H:00:00') AS hour_slot, AVG(temperature) AS avg_temperature
 FROM Weather_Data
 GROUP BY hour_slot
